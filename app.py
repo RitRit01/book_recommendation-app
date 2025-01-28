@@ -125,7 +125,7 @@ def load_models_and_data():
     download_file_from_drive(cbf_model_url, cbf_model_path)
 
     # Load dataset
-    data = pd.read_csv(dataset_path)
+    data = pd.read_csv(dataset_path,  on_bad_lines="skip")
 
     # Re-encode the dataset
     data, user_encoder, book_encoder, title_encoder = encode_labels_full_dataset(data)

@@ -4,6 +4,8 @@ import pickle
 import pandas as pd
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
+import os
+import requests
 
 # Collaborative Filtering Model
 class CollaborativeFilteringModel(nn.Module):
@@ -104,25 +106,22 @@ def download_file_from_drive(drive_url, output_path):
         st.success(f"{output_path} downloaded successfully!")
     return output_path
 
-# Update `load_models_and_data` to download models
 @st.cache_resource
 def load_models_and_data():
-    # Define Google Drive links
-    dataset_url = "https://drive.google.com/file/d/1NfqAOGslnIT8wQYa8ZWLgzqeuoJwkDDs/view?usp=sharing"
-    cf_model_url = "https://drive.google.com/file/d/1to_cmpPNMnZspZtskdOuuYbVZNsF70Gz/view?usp=sharing"
-    cbf_model_url = "https://drive.google.com/file/d/1brAu54LbjTEeUBmu1z_kpD4E2EAINtHV/view?usp=sharing"
+    # Updated Google Drive links for direct download
+    dataset_url = "https://drive.google.com/uc?export=download&id=1NfqAOGslnIT8wQYa8ZWLgzqeuoJwkDDs"
+    cf_model_url = "https://drive.google.com/uc?export=download&id=1to_cmpPNMnZspZtskdOuuYbVZNsF70Gz"
+    cbf_model_url = "https://drive.google.com/uc?export=download&id=1brAu54LbjTEeUBmu1z_kpD4E2EAINtHV"
 
-    # File paths
     dataset_path = "data_with_sentiment_labels.csv"
     cf_model_path = "cf_model.pth"
     cbf_model_path = "cbf_model.pth"
 
-    # Download files if they don't exist locally
+    # Ensure files are downloaded
     download_file_from_drive(dataset_url, dataset_path)
     download_file_from_drive(cf_model_url, cf_model_path)
     download_file_from_drive(cbf_model_url, cbf_model_path)
 
-    # Load dataset
     data = pd.read_csv(dataset_path)
 
     # Re-encode the dataset

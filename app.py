@@ -110,9 +110,9 @@ def download_file_from_drive(drive_url, output_path):
 @st.cache_resource
 def load_models_and_data():
     # Define Google Drive links
-    dataset_url = "https://drive.google.com/file/d/1NfqAOGslnIT8wQYa8ZWLgzqeuoJwkDDs/view?usp=sharing"
-    cf_model_url = "https://drive.google.com/file/d/1to_cmpPNMnZspZtskdOuuYbVZNsF70Gz/view?usp=sharing"
-    cbf_model_url = "https://drive.google.com/file/d/1brAu54LbjTEeUBmu1z_kpD4E2EAINtHV/view?usp=sharing"
+    dataset_url = "https://drive.google.com/uc?export=download&id=FILE_ID/view?usp=sharing"
+    cf_model_url = "https://drive.google.com/uc?export=download&id=FILE_ID/view?usp=sharing"
+    cbf_model_url = "https://drive.google.com//uc?export=download&id=FILE_ID/view?usp=sharing"
 
     # File paths
     dataset_path = "data_with_sentiment_labels.csv"

@@ -95,10 +95,37 @@ def ensure_embedding_dimensions(cbf_model, title_to_index, checkpoint):
 
     return cbf_model
 
+def download_file_from_drive(drive_url, output_path):
+    if not os.path.exists(output_path):
+        st.info(f"Downloading {output_path} from Google Drive...")
+        response = requests.get(drive_url)
+        with open(output_path, "wb") as f:
+            f.write(response.content)
+        st.success(f"{output_path} downloaded successfully!")
+    return output_path
+
+# Update `load_models_and_data` to download models
 @st.cache_resource
 def load_models_and_data():
-    # Load and re-encode the dataset
-    data = pd.read_csv('data_with_sentiment_labels.csv')
+    # Define Google Drive links
+    dataset_url = "https://drive.google.com/file/d/1NfqAOGslnIT8wQYa8ZWLgzqeuoJwkDDs/view?usp=sharing"
+    cf_model_url = "https://drive.google.com/file/d/1to_cmpPNMnZspZtskdOuuYbVZNsF70Gz/view?usp=sharing"
+    cbf_model_url = "https://drive.google.com/file/d/1brAu54LbjTEeUBmu1z_kpD4E2EAINtHV/view?usp=sharing"
+
+    # File paths
+    dataset_path = "data_with_sentiment_labels.csv"
+    cf_model_path = "cf_model.pth"
+    cbf_model_path = "cbf_model.pth"
+
+    # Download files if they don't exist locally
+    download_file_from_drive(dataset_url, dataset_path)
+    download_file_from_drive(cf_model_url, cf_model_path)
+    download_file_from_drive(cbf_model_url, cbf_model_path)
+
+    # Load dataset
+    data = pd.read_csv(dataset_path)
+
+    # Re-encode the dataset
     data, user_encoder, book_encoder, title_encoder = encode_labels_full_dataset(data)
 
     # Save the updated encoders
@@ -113,11 +140,11 @@ def load_models_and_data():
     num_users = len(user_encoder)
     num_books = len(book_encoder)
     cf_model = CollaborativeFilteringModel(num_users, num_books, embedding_dim=150, hidden_dim=128)
-    cf_model.load_state_dict(torch.load("cf_model.pth", map_location=torch.device("cpu")))
+    cf_model.load_state_dict(torch.load(cf_model_path, map_location=torch.device("cpu")))
     cf_model.eval()
 
     # Load CBF Model
-    checkpoint = torch.load("cbf_model.pth", map_location=torch.device("cpu"))
+    checkpoint = torch.load(cbf_model_path, map_location=torch.device("cpu"))
     cbf_model = ContentBasedFilteringModel(
         num_categories=checkpoint['category_embedding.weight'].shape[0],
         num_authors=checkpoint['author_embedding.weight'].shape[0],

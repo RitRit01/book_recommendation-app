@@ -125,7 +125,21 @@ def load_models_and_data():
     download_file_from_drive(cbf_model_url, cbf_model_path)
 
     # Load dataset
-    data = pd.read_csv(dataset_path,  on_bad_lines="skip")
+    data = pd.read_csv(dataset_path, on_bad_lines="skip")  # Skip malformed rows
+
+    # Debug: Check dataset sample and column names
+    st.write("Dataset Columns:", data.columns.tolist())
+    st.write("Dataset Sample:")
+    st.write(data.head())
+
+    # Strip spaces from column names
+    data.columns = data.columns.str.strip()
+
+    # Validate required columns
+    if "User_id" not in data.columns or "Id" not in data.columns or "Title" not in data.columns:
+        st.error("Dataset is missing required columns: User_id, Id, or Title.")
+        st.write("Available Columns:", data.columns.tolist())
+        return None, None, None, None, None, None
 
     # Re-encode the dataset
     data, user_encoder, book_encoder, title_encoder = encode_labels_full_dataset(data)
@@ -139,13 +153,13 @@ def load_models_and_data():
         pickle.dump(title_encoder, f)
 
     # Load CF Model
-    num_users = len(user_encoder)
-    num_books = len(book_encoder)
-    cf_model = CollaborativeFilteringModel(num_users, num_books, embedding_dim=150, hidden_dim=128)
+    cf_model_path = "cf_model.pth"
+    cf_model = CollaborativeFilteringModel(len(user_encoder), len(book_encoder), embedding_dim=150, hidden_dim=128)
     cf_model.load_state_dict(torch.load(cf_model_path, map_location=torch.device("cpu")))
     cf_model.eval()
 
     # Load CBF Model
+    cbf_model_path = "cbf_model.pth"
     checkpoint = torch.load(cbf_model_path, map_location=torch.device("cpu"))
     cbf_model = ContentBasedFilteringModel(
         num_categories=checkpoint['category_embedding.weight'].shape[0],

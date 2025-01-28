@@ -207,11 +207,10 @@ def recommend_for_user(user_id, cf_model, cbf_model, user_encoder, book_encoder,
 # Streamlit App
 def main():
     st.title("Optimized Hybrid Book Recommendation System")
-    st.write("Dataset Columns:", data.columns)
     # Load models, data, and encoders
     data, cf_model, cbf_model, user_encoder, book_encoder, title_encoder = load_models_and_data()
     reverse_book_encoder, reverse_title_index = create_reverse_mappings(book_encoder, title_encoder)
-
+    st.write("Dataset Columns:", data.columns)
     # User input
     user_id = st.text_input("Enter User ID:")
 
@@ -220,6 +219,7 @@ def main():
         recommendations = recommend_for_user(
             user_id, cf_model, cbf_model, user_encoder, book_encoder, reverse_book_encoder, reverse_title_index, is_new_user
         )
+        
 
         # Display recommendations
         st.subheader(f"Top Recommendations for {'New' if is_new_user else 'Existing'} User: {user_id}")
